@@ -35,6 +35,7 @@ export default function MagicLinkPage() {
       setIsEmailSent(true);
       toast.success("Magic link sent to your email!");
     } catch (error) {
+      console.error("Magic link error:", error);
       toast.error("Failed to send magic link. Please try again.");
     } finally {
       setIsLoading(false);
@@ -84,7 +85,7 @@ export default function MagicLinkPage() {
             ) : (
               <div className="text-center space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  We've sent a magic link to {form.getValues("email")}. Click the link in the email to log in.
+                  We&apos;ve sent a magic link to {form.getValues("email")}. Click the link in the email to log in.
                 </p>
                 <Button
                   variant="outline"

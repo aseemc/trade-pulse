@@ -9,7 +9,7 @@ export function AccountSettingsView() {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          This section is under construction. You'll soon be able to manage login methods, security settings, and more.
+          This section is under construction. You&apos;ll soon be able to manage login methods, security settings, and more.
         </p>
       </CardContent>
     </Card>

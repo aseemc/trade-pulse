@@ -7,7 +7,6 @@ import { AccountSettingsView } from "@/components/account-settings-view"
 import { NotificationsSettingsForm } from "@/components/notifications-settings-form"
 import { ProfileSettingsForm, type UserProfile } from "@/components/profile-settings-form"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 

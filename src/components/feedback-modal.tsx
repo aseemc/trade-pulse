@@ -1,11 +1,12 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FileImage, FileText, Loader2, Paperclip, X } from "lucide-react"
+import { FileText, Loader2, Paperclip, X } from "lucide-react"
 import { useState, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -271,9 +272,11 @@ export function FeedbackModal({ isOpen, onOpenChange }: FeedbackModalProps) {
                 <div className="relative flex items-center gap-3 rounded-md border bg-muted/40 p-2.5 pr-10">
                   <div className="flex size-12 flex-shrink-0 items-center justify-center rounded-md bg-background">
                     {filePreview.previewUrl ? (
-                      <img
+                      <Image
                         src={filePreview.previewUrl}
                         alt={filePreview.name}
+                        width={48}
+                        height={48}
                         className="size-full rounded-md object-cover"
                       />
                     ) : filePreview.type === "application/pdf" ? (

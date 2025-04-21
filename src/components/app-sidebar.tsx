@@ -2,31 +2,17 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
   LayoutDashboard,
-  Map,
   MessageSquare,
-  PieChart,
   Settings,
-  Settings2,
   Sparkles,
   SquareActivity,
-  SquareTerminal,
-  User,
 } from "lucide-react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import { FeedbackModal } from "@/components/feedback-modal"
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
