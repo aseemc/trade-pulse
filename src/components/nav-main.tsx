@@ -18,6 +18,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
 
 // Updated NavItem type: url and onClick are optional and mutually exclusive enforced by usage
 interface BaseNavItem {
@@ -27,7 +28,8 @@ interface BaseNavItem {
   items?: {
     title: string
     url: string // Sub-items always have a URL
-  }[]
+  }[],
+  highlight?: boolean
 }
 
 interface LinkNavItem extends BaseNavItem {
@@ -62,12 +64,12 @@ export function NavMain({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title} asChild={!!item.url}>
                 {item.url ? (
-                  <Link href={item.url} className="flex items-center">
+                  <Link href={item.url} className={cn("flex items-center", item.highlight && "bg-primary text-primary-foreground hover:bg-primary/90")}>
                     {Icon}
                     {Title}
                   </Link>
                 ) : (
-                  <button onClick={item.onClick} className="flex items-center gap-2 cursor-pointer">
+                  <button onClick={item.onClick} className={cn("flex items-center gap-2 cursor-pointer", item.highlight && "bg-primary text-primary-foreground hover:bg-primary/90")}>
                     {Icon}
                     {Title}
                   </button>

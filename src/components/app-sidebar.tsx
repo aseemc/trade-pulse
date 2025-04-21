@@ -14,6 +14,7 @@ import {
   PieChart,
   Settings,
   Settings2,
+  Sparkles,
   SquareActivity,
   SquareTerminal,
   User,
@@ -23,7 +24,6 @@ import { FeedbackModal } from "@/components/feedback-modal"
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
-import { NavUpgrade } from "@/components/nav-upgrade"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
@@ -65,6 +65,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
   ]
 
+  const appUpgrade = [
+    {
+      title: "Upgrade to Pro",
+      url: "/upgrade",
+      icon: Sparkles,
+      highlight: true,
+    },
+  ]
+
   return (
     <>
       <Sidebar collapsible="icon" {...props}>
@@ -88,8 +97,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent>
           <NavMain items={applicationItems} label="Application" />
         </SidebarContent>
-        <div className="mt-auto p-2">
-          <NavUpgrade />
+        <div className="mt-auto">
+          <NavMain items={appUpgrade} label="Upgrade" />
         </div>
         <SidebarFooter>
           <NavUser user={data.user} />
