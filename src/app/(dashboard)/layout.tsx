@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import { NavActions } from "@/components/nav-actions"
 import {
@@ -6,12 +8,20 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
+import { usePathname } from "next/navigation"
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const pathname = usePathname()
+  const segments = pathname.split("/")
+  const lastSegment = segments[segments.length - 1]
+  const pageTitle = lastSegment 
+    ? lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1)
+    : "Dashboard"
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -23,6 +33,9 @@ export default function DashboardLayout({
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
+            <span className="text-2xl font-bold text-primary">
+              {pageTitle}
+            </span>
           </div>
           <NavActions />
         </header>
