@@ -22,6 +22,7 @@ import {
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
+import { NavUpgrade } from "@/components/nav-upgrade"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
@@ -80,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">Trade Pulse</span>
-                    <span className="truncate text-xs">Premium</span>
+                    <span className="truncate text-xs text-muted-foreground">Premium</span>
                   </div>
                 </div>
           </SidebarMenuItem>
@@ -90,6 +91,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.application} label="Application" />
         <NavMain items={data.account} label="Account" />
       </SidebarContent>
+      <div className="mt-auto mb-4 px-4">
+        <NavUpgrade />
+      </div>
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
