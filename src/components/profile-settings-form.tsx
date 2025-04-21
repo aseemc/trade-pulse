@@ -23,7 +23,8 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 // Sample user data structure
-interface UserProfile {
+// Export the UserProfile type
+export interface UserProfile {
   email: string
   firstName: string
   lastName: string
