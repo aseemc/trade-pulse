@@ -34,7 +34,6 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarRail,
 } from "@/components/ui/sidebar"
 
 // This is sample data.
@@ -79,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <>
-      <Sidebar collapsible="icon" {...props}>
+      <Sidebar collapsible="icon" {...props} className="pl-1">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -91,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </div>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">Trade Pulse</span>
-                      <span className="truncate text-xs">Premium</span>
+                      <span className="truncate text-xs text-muted-foreground">Free</span>
                     </div>
                   </div>
             </SidebarMenuItem>
@@ -106,7 +105,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarFooter>
           <NavUser user={data.user} />
         </SidebarFooter>
-        <SidebarRail />
       </Sidebar>
 
       <FeedbackModal isOpen={isFeedbackModalOpen} onOpenChange={setIsFeedbackModalOpen} />

@@ -25,23 +25,21 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
+      <SidebarInset className="border-1 rounded-lg border-transparent m-2 shadow-md">
+        <header className="flex h-14 shrink-0 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <span className="text-xl font-bold text-primary">
+            <span className="text-md font-semibold text-primary">
               {pageTitle}
             </span>
           </div>
           <NavActions />
         </header>
-        <div className="px-4">
         <Separator />
-        </div>
 
         {children}
       </SidebarInset>
