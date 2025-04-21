@@ -27,7 +27,7 @@ export function NavUpgrade() {
           <TooltipTrigger asChild>
             <Button asChild className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/upgrade" className="flex items-center">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary/20 text-primary-foreground">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary/20 text-primary-foreground dark:bg-primary/20 dark:text-primary-foreground">
                   <Sparkles className="size-4" />
                 </div>
                 <div className={cn(
