@@ -50,15 +50,7 @@ export function SettingsLayout() {
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account settings and notification preferences.
-        </p>
-      </div>
-      <Separator />
-      
+    <div className="space-y-6 p-4">
       <div className="lg:hidden">
         <Tabs value={activeSection} onValueChange={(value: string) => setActiveSection(value as SettingsSection)} className="w-full">
           <TabsList className="grid w-full grid-cols-5">
