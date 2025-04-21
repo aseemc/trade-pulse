@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
   SidebarMenu,
+  SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
@@ -18,19 +19,19 @@ export function NavUpgrade() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Button asChild className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+        <SidebarMenuButton asChild className="w-full text-primary-foreground hover:bg-primary/90" tooltip="Upgrade to Pro">
           <Link href="/upgrade" className="flex items-center">
-            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg bg-transparent">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Sparkles className="size-4" />
             </div>
             <div className={cn(
-              "ml-2 transition-[opacity,visibility,width] duration-200",
-              isCollapsed ? "opacity-0 invisible w-0 -ml-2" : "opacity-100 visible w-auto"
+              "transition-[opacity,visibility,width] duration-200",
+              isCollapsed ? "opacity-0 invisible w-0" : "opacity-100 visible w-auto"
             )}>
               <span>Upgrade to Pro</span>
             </div>
           </Link>
-        </Button>
+        </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
   )

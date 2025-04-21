@@ -67,7 +67,7 @@ export function NavMain({
                     {Title}
                   </Link>
                 ) : (
-                  <button onClick={item.onClick} className="flex items-center gap-2">
+                  <button onClick={item.onClick} className="flex items-center gap-2 cursor-pointer">
                     {Icon}
                     {Title}
                   </button>
