@@ -19,6 +19,7 @@ import {
   User,
 } from "lucide-react"
 
+import { FeedbackModal } from "@/components/feedback-modal"
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
@@ -41,7 +42,12 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  application: [
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = React.useState(false)
+
+  const applicationItems = [
     {
       title: "Dashboard",
       url: "/dashboard",
@@ -49,11 +55,12 @@ const data = {
     },
     {
       title: "Feedback",
-      url: "/feedback",
       icon: MessageSquare,
+      onClick: () => setIsFeedbackModalOpen(true),
     },
-  ],
-  account: [
+  ]
+
+  const accountItems = [
     {
       title: "Profile",
       url: "/profile",
@@ -64,40 +71,42 @@ const data = {
       url: "/settings",
       icon: Settings,
     },
-  ],
-}
+  ]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <div
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-2 mt-2"
-                >
-                  <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                    <SquareActivity className="size-4" />
+    <>
+      <Sidebar collapsible="icon" {...props}>
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <div
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-2 mt-2"
+                  >
+                    <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                      <SquareActivity className="size-4" />
+                    </div>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">Trade Pulse</span>
+                      <span className="truncate text-xs">Premium</span>
+                    </div>
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">Trade Pulse</span>
-                    <span className="truncate text-xs text-muted-foreground">Premium</span>
-                  </div>
-                </div>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.application} label="Application" />
-        <NavMain items={data.account} label="Account" />
-      </SidebarContent>
-      <div className="mt-auto mb-4 px-4">
-        <NavUpgrade />
-      </div>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent>
+          <NavMain items={applicationItems} label="Application" />
+          <NavMain items={accountItems} label="Account" />
+        </SidebarContent>
+        <div className="mt-auto p-4">
+          <NavUpgrade />
+        </div>
+        <SidebarFooter>
+          <NavUser user={data.user} />
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+
+      <FeedbackModal isOpen={isFeedbackModalOpen} onOpenChange={setIsFeedbackModalOpen} />
+    </>
   )
 }
