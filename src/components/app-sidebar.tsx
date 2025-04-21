@@ -58,14 +58,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: MessageSquare,
       onClick: () => setIsFeedbackModalOpen(true),
     },
-  ]
-
-  const accountItems = [
-    {
-      title: "Profile",
-      url: "/profile",
-      icon: User,
-    },
     {
       title: "Settings",
       url: "/settings",
@@ -95,7 +87,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarHeader>
         <SidebarContent>
           <NavMain items={applicationItems} label="Application" />
-          <NavMain items={accountItems} label="Account" />
         </SidebarContent>
         <div className="mt-auto p-4">
           <NavUpgrade />
