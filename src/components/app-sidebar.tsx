@@ -88,7 +88,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent>
           <NavMain items={applicationItems} label="Application" />
         </SidebarContent>
-        <div className="mt-auto p-4">
+        <div className="mt-auto p-2">
           <NavUpgrade />
         </div>
         <SidebarFooter>
