@@ -35,6 +35,7 @@ export default function ForgotPasswordPage() {
       setIsEmailSent(true);
       toast.success("Password reset instructions sent to your email!");
     } catch (error) {
+      console.error("Password reset error:", error);
       toast.error("Failed to send reset instructions. Please try again.");
     } finally {
       setIsLoading(false);
