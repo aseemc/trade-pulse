@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 
 import { AccountSettingsView } from "@/components/account-settings-view"
 import { NotificationsSettingsForm } from "@/components/notifications-settings-form"
@@ -30,7 +31,25 @@ const sidebarNavItems = [
 type SettingsSection = "profile" | "account" | "appearance" | "notifications" | "display"
 
 export function SettingsLayout() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [activeSection, setActiveSection] = React.useState<SettingsSection>("profile")
+
+  React.useEffect(() => {
+    // Get the section from URL query parameter
+    const section = searchParams.get("section") as SettingsSection
+    if (section && sidebarNavItems.some(item => item.key === section)) {
+      setActiveSection(section)
+    }
+  }, [searchParams])
+
+  const handleSectionChange = (section: SettingsSection) => {
+    setActiveSection(section)
+    // Clear the query parameter when switching tabs
+    const url = new URL(window.location.href)
+    url.searchParams.delete("section")
+    router.replace(url.pathname)
+  }
 
   const renderSection = () => {
     switch (activeSection) {
@@ -52,7 +71,7 @@ export function SettingsLayout() {
   return (
     <div className="space-y-6 p-4">
       <div className="lg:hidden">
-        <Tabs value={activeSection} onValueChange={(value: string) => setActiveSection(value as SettingsSection)} className="w-full">
+        <Tabs value={activeSection} onValueChange={(value: string) => handleSectionChange(value as SettingsSection)} className="w-full">
           <TabsList className="grid w-full grid-cols-5">
             {sidebarNavItems.map((item) => (
               <TabsTrigger key={item.key} value={item.key}>
@@ -80,7 +99,7 @@ export function SettingsLayout() {
                     : "hover:bg-transparent",
                   "hover:underline"
                 )}
-                onClick={() => setActiveSection(item.key as SettingsSection)}
+                onClick={() => handleSectionChange(item.key as SettingsSection)}
               >
                 {item.title}
               </Button>

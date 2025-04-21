@@ -19,6 +19,8 @@ import {
   SquareTerminal,
   User,
 } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import { FeedbackModal } from "@/components/feedback-modal"
 import { NavMain } from "@/components/nav-main"
@@ -46,6 +48,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = React.useState(false)
+  const router = useRouter()
 
   const applicationItems = [
     {
@@ -68,9 +71,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const appUpgrade = [
     {
       title: "Upgrade to Pro",
-      url: "/upgrade",
+      onClick: () => router.push("/settings?section=account"),
       icon: Sparkles,
-      highlight: true,
+      highlight: true
     },
   ]
 
@@ -98,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={applicationItems} label="Application" />
         </SidebarContent>
         <div className="mt-auto">
-          <NavMain items={appUpgrade} label="Upgrade" />
+          <NavMain items={appUpgrade} label="" />
         </div>
         <SidebarFooter>
           <NavUser user={data.user} />
