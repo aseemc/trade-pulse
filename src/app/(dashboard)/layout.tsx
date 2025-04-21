@@ -33,7 +33,7 @@ export default function DashboardLayout({
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <span className="text-2xl font-bold text-primary">
+            <span className="text-xl font-bold text-primary">
               {pageTitle}
             </span>
           </div>
