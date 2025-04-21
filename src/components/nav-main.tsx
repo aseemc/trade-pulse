@@ -64,12 +64,12 @@ export function NavMain({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title} asChild={!!item.url}>
                 {item.url ? (
-                  <Link href={item.url} className={cn("flex items-center", item.highlight && "bg-primary text-primary-foreground hover:bg-primary/90")}>
+                  <Link href={item.url} className="flex items-center">
                     {Icon}
                     {Title}
                   </Link>
                 ) : (
-                  <button onClick={item.onClick} className={cn("flex items-center gap-2 cursor-pointer", item.highlight && "bg-primary text-primary-foreground hover:bg-primary/90")}>
+                  <button onClick={item.onClick} className="flex items-center gap-2 cursor-pointer">
                     {Icon}
                     {Title}
                   </button>
