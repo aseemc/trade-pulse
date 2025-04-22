@@ -58,6 +58,7 @@ export function SettingsLayout() {
       lastName: profile.last_name,
       dob: profile.dob ? new Date(profile.dob) : undefined,
       avatarUrl: profile.avatar || undefined,
+      userId: profile.user_id,
     }
 
     switch (activeSection) {

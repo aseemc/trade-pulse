@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { updateProfile } from "@/lib/actions/profile"
 import { useProfileContext } from "@/contexts/profile-context"
+import { supabase } from "@/lib/supabase"
 
 // Sample user data structure
 // Export the UserProfile type
@@ -31,6 +32,7 @@ export interface UserProfile {
   lastName: string
   dob?: Date
   avatarUrl?: string
+  userId: string
 }
 
 // Zod schema for validation
@@ -65,24 +67,83 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
     },
   })
 
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (files && files[0] && files[0].type.startsWith("image/")) {
+    if (files && files[0]) {
       const file = files[0]
+      
+      // Validate file size (2MB limit)
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('File size must be less than 2MB')
+        event.target.value = ""
+        return
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file')
+        event.target.value = ""
+        return
+      }
+      
+      // Show preview immediately
       const reader = new FileReader()
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string)
       }
       reader.readAsDataURL(file)
+
+      try {
+        // Create a unique file path using user ID and timestamp
+        const fileExt = file.name.split('.').pop()
+        const filePath = `${userData?.userId}/avatar.${fileExt}`
+
+        // Upload directly to Supabase storage
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          })
+
+        if (uploadError) {
+          toast.error("Error uploading avatar. Please try again.")
+          return
+        }
+
+        // Get the public URL of the uploaded file
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath)
+
+        // Update the user's profile with the new avatar URL
+        const result = await updateProfile({
+          first_name: form.getValues('firstName'),
+          last_name: form.getValues('lastName'),
+          dob: form.getValues('dob')?.toISOString() || null,
+          avatar: publicUrl,
+        })
+
+        if (result.error) {
+          toast.error(result.error)
+          return
+        }
+
+        setAvatarPreview(publicUrl)
+        refetch()
+        toast.success('Avatar updated successfully')
+      } catch (error) {
+        console.error('Upload error:', error)
+        toast.error("Failed to upload avatar")
+        // Reset preview on error
+        setAvatarPreview(userData?.avatarUrl || null)
+      }
     } else {
       event.target.value = "";
       if (!files || files.length === 0) {
         setAvatarPreview(userData?.avatarUrl || null);
       }
       form.setValue("avatar", undefined, { shouldValidate: true });
-      if (files && files.length > 0) {
-        toast.error("Please select a valid image file.");
-      }
     }
   };
 
@@ -101,8 +162,10 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
         return
       }
 
+      // Refresh the profile context
+      refetch()
+      
       toast.success("Profile updated successfully!")
-      await refetch()
       form.reset({ ...data, avatar: undefined });
       if (avatarInputRef.current) avatarInputRef.current.value = "";
     } catch (error) {
