@@ -217,7 +217,7 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
           name="dob"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Date of birth</FormLabel>
+              <FormLabel>Date of birth (Optional)</FormLabel>
               <DatePicker
                 date={field.value}
                 setDate={field.onChange}
