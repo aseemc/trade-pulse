@@ -20,6 +20,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { updateProfile } from "@/lib/actions/profile"
+import { useProfileContext } from "@/contexts/profile-context"
+import { supabase } from "@/lib/supabase"
 
 // Sample user data structure
 // Export the UserProfile type
@@ -29,6 +32,7 @@ export interface UserProfile {
   lastName: string
   dob?: Date
   avatarUrl?: string
+  userId: string
 }
 
 // Zod schema for validation
@@ -49,7 +53,8 @@ interface ProfileSettingsFormProps {
 export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(userData?.avatarUrl || null);
-  const avatarInputRef = useRef<HTMLInputElement>(null); // Ref for avatar input
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const { refetch } = useProfileContext();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -62,111 +67,155 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
     },
   })
 
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (files && files[0] && files[0].type.startsWith("image/")) {
+    if (files && files[0]) {
       const file = files[0]
+      
+      // Validate file size (2MB limit)
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('File size must be less than 2MB')
+        event.target.value = ""
+        return
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file')
+        event.target.value = ""
+        return
+      }
+      
+      // Show preview immediately
       const reader = new FileReader()
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string)
       }
       reader.readAsDataURL(file)
-      // RHF's field.onChange already handles setting the FileList value
+
+      try {
+        // Create a unique file path using user ID and timestamp
+        const fileExt = file.name.split('.').pop()
+        const filePath = `${userData?.userId}/avatar.${fileExt}`
+
+        // Upload directly to Supabase storage
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          })
+
+        if (uploadError) {
+          toast.error("Error uploading avatar. Please try again.")
+          return
+        }
+
+        // Get the public URL of the uploaded file
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath)
+
+        // Update the user's profile with the new avatar URL
+        const result = await updateProfile({
+          first_name: form.getValues('firstName'),
+          last_name: form.getValues('lastName'),
+          dob: form.getValues('dob')?.toISOString() || null,
+          avatar: publicUrl,
+        })
+
+        if (result.error) {
+          toast.error(result.error)
+          return
+        }
+
+        setAvatarPreview(publicUrl)
+        refetch()
+        toast.success('Avatar updated successfully')
+      } catch (error) {
+        console.error('Upload error:', error)
+        toast.error("Failed to upload avatar")
+        // Reset preview on error
+        setAvatarPreview(userData?.avatarUrl || null)
+      }
     } else {
-      // If invalid file or selection cancelled
-      event.target.value = ""; // Clear the file input
-      // Revert preview only if they cancelled selection, not if invalid type was just chosen
+      event.target.value = "";
       if (!files || files.length === 0) {
-         setAvatarPreview(userData?.avatarUrl || null);
+        setAvatarPreview(userData?.avatarUrl || null);
       }
-       // Optionally clear the RHF state if needed, though zod validation might handle it
       form.setValue("avatar", undefined, { shouldValidate: true });
-      if (files && files.length > 0) {
-          toast.error("Please select a valid image file.");
-      }
     }
   };
 
   const onSubmit = async (data: ProfileFormValues) => {
     setIsSubmitting(true)
-    const updateData = {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      dob: data.dob,
-      avatarFile: data.avatar?.[0], // Get the actual File object
-    }
-    console.log("Updating profile with:", updateData)
+    try {
+      const result = await updateProfile({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        dob: data.dob?.toISOString() || null,
+        avatar: avatarPreview || null,
+      })
 
-    // Simulate API call - use FormData if sending avatarFile
-    // const formData = new FormData();
-    // Object.entries(updateData).forEach(([key, value]) => {
-    //   if (value !== undefined && value !== null) {
-    //     formData.append(key, value as any);
-    //   }
-    // });
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
 
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    const success = Math.random() > 0.3
-
-    if (success) {
+      // Refresh the profile context
+      refetch()
+      
       toast.success("Profile updated successfully!")
-      // If API returns a new URL after upload, update the preview:
-      // const newAvatarUrlFromApi = "/path/to/new/avatar.jpg";
-      // setAvatarPreview(newAvatarUrlFromApi);
-      // Reset the file input in the form state after successful upload
-      form.reset({ ...data, avatar: undefined }); // Reset form but keep successful data, clear file input
+      form.reset({ ...data, avatar: undefined });
       if (avatarInputRef.current) avatarInputRef.current.value = "";
-    } else {
+    } catch (error) {
       toast.error("Failed to update profile.")
+    } finally {
+      setIsSubmitting(false)
     }
-    setIsSubmitting(false)
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
-         {/* Avatar Upload - Centered with Bottom-Right Edit Button */}
+        {/* Avatar Upload - Centered with Bottom-Right Edit Button */}
         <FormField
           control={form.control}
           name="avatar"
           render={({ field }) => (
-             <FormItem className="flex flex-col items-center space-y-2">
-                 {/* Relative container for avatar and button */}
-                 <div className="relative">
-                     <Avatar className="h-24 w-24"> {/* Avatar no longer clickable */}
-                        <AvatarImage src={avatarPreview || undefined} alt="User avatar" />
-                        <AvatarFallback>{userData?.firstName?.[0]}{userData?.lastName?.[0]}</AvatarFallback>
-                    </Avatar>
-                    {/* Edit Button - Positioned bottom-right */}
-                     <Button 
-                        type="button"
-                        variant="secondary" // Use secondary or adjust as needed
-                        size="icon"
-                        className="absolute -bottom-0.5 -right-0.5 h-9 w-9 cursor-pointer border-3 border-white rounded-full hover:shadow-md transition-all duration-300 bg-primary hover:bg-primary hover:scale-110"
-                        onClick={() => avatarInputRef.current?.click()}
-                      >
-                         <Pencil className="h-4 w-4 text-white" />
-                     </Button>
-                     {/* Hidden File Input */}
-                      <Input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          ref={avatarInputRef} // Ref for programmatic click
-                          onChange={(e) => {
-                              field.onChange(e.target.files); // Update RHF state
-                              handleAvatarChange(e); // Update preview
-                          }}
-                      />
-                  </div>
-                <FormMessage />
+            <FormItem className="flex flex-col items-center space-y-2">
+              <div className="relative">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={avatarPreview || undefined} alt="User avatar" />
+                  <AvatarFallback>{userData?.firstName?.[0]}{userData?.lastName?.[0]}</AvatarFallback>
+                </Avatar>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className="absolute -bottom-0.5 -right-0.5 h-9 w-9 cursor-pointer border-3 border-white rounded-full hover:shadow-md transition-all duration-300 bg-primary hover:bg-primary hover:scale-110"
+                  onClick={() => avatarInputRef.current?.click()}
+                >
+                  <Pencil className="h-4 w-4 text-white" />
+                </Button>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={avatarInputRef}
+                  onChange={(e) => {
+                    field.onChange(e.target.files);
+                    handleAvatarChange(e);
+                  }}
+                />
+              </div>
+              <FormMessage />
             </FormItem>
           )}
         />
 
         {/* First Name & Last Name Row */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-8">
+        <div className="grid gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
             name="firstName"
@@ -174,7 +223,7 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
               <FormItem>
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your first name" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -187,7 +236,7 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your last name" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -195,7 +244,7 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
           />
         </div>
 
-        {/* Email (Disabled) - Moved Below Name Row */}
+        {/* Email Field */}
         <FormField
           control={form.control}
           name="email"
@@ -203,26 +252,29 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="Your email address" {...field} disabled />
+                <Input {...field} disabled />
               </FormControl>
-              {/* Removed FormDescription */}
+              <FormDescription>
+                Your email address cannot be changed.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Date of Birth */}
+        {/* Date of Birth Field */}
         <FormField
           control={form.control}
           name="dob"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date of birth</FormLabel>
-              <DatePicker
-                date={field.value}
-                setDate={field.onChange}
-                placeholder="Select your date of birth"
-              />
+            <FormItem>
+              <FormLabel>Date of Birth (Optional)</FormLabel>
+              <FormControl>
+                <DatePicker
+                  date={field.value}
+                  setDate={field.onChange}
+                />
+              </FormControl>
               <FormDescription>
                 Your date of birth is used to personalize your experience.
               </FormDescription>

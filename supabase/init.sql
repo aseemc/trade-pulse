@@ -61,6 +61,9 @@ on "public"."profiles"
 as PERMISSIVE
 for UPDATE
 to authenticated
+using (
+  (select auth.uid()) = user_id
+)
 with check (
   (select auth.uid()) = user_id
 );
@@ -78,41 +81,24 @@ using (
 -- Create a storage bucket for avatars with public access and max size of 2MB
 insert into storage.buckets (id, name, public, file_size_limit) values ('avatars', 'avatars', true, 2097152);
 
--- Create a policy to allow users to upload their own avatars
-CREATE POLICY "Users can upload their own avatars"
-ON storage.objects FOR INSERT
+-- Create a policy to allow authenticated users to manage their avatars
+CREATE POLICY "Users can manage their own avatars"
+ON storage.objects FOR ALL
 TO authenticated
+USING (
+  bucket_id = 'avatars' AND 
+  (storage.foldername(name))[1] = auth.uid()::text
+)
 WITH CHECK (
   bucket_id = 'avatars' AND 
   (storage.foldername(name))[1] = auth.uid()::text
 );
 
--- Create a policy to allow users to view their own avatars
-CREATE POLICY "Users can view their own avatars"
+-- Create a policy to allow public access to avatars
+CREATE POLICY "Public access to avatars"
 ON storage.objects FOR SELECT
-TO authenticated
-WITH CHECK (
-  bucket_id = 'avatars' AND 
-  (storage.foldername(name))[1] = auth.uid()::text  
-);
-
--- Create a policy to allow users to delete their own avatars
-CREATE POLICY "Users can delete their own avatars"
-ON storage.objects FOR DELETE
-TO authenticated
-WITH CHECK (
-  bucket_id = 'avatars' AND 
-  (storage.foldername(name))[1] = auth.uid()::text
-);
-
--- Create policy to allow users to update their own avatars
-CREATE POLICY "Users can update their own avatars"
-ON storage.objects FOR UPDATE
-TO authenticated
-WITH CHECK (
-  bucket_id = 'avatars' AND 
-  (storage.foldername(name))[1] = auth.uid()::text
-);
+TO public
+USING (bucket_id = 'avatars');
 
 -- Create feedbacks table
 create table public.feedbacks (

@@ -9,15 +9,7 @@ import { ProfileSettingsForm, type UserProfile } from "@/components/profile-sett
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
-
-// Sample user data for profile prefill - replace with actual data source
-const sampleUserData: UserProfile = {
-  firstName: "shadcn",
-  lastName: "UI",
-  email: "m@example.com",
-  avatarUrl: "/avatars/shadcn.jpg", // Make sure this path exists in your public folder or is a valid URL
-  dob: new Date("1990-05-15"),
-}
+import { useProfileContext } from "@/contexts/profile-context"
 
 const sidebarNavItems = [
   { title: "Profile", key: "profile" },
@@ -33,6 +25,7 @@ export function SettingsLayout() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [activeSection, setActiveSection] = React.useState<SettingsSection>("profile")
+  const { profile, loading } = useProfileContext()
 
   React.useEffect(() => {
     // Get the section from URL query parameter
@@ -51,9 +44,26 @@ export function SettingsLayout() {
   }
 
   const renderSection = () => {
+    if (loading) {
+      return <div>Loading...</div>
+    }
+
+    if (!profile) {
+      return <div>No profile data available</div>
+    }
+
+    const userData: UserProfile = {
+      email: profile.email,
+      firstName: profile.first_name,
+      lastName: profile.last_name,
+      dob: profile.dob ? new Date(profile.dob) : undefined,
+      avatarUrl: profile.avatar || undefined,
+      userId: profile.user_id,
+    }
+
     switch (activeSection) {
       case "profile":
-        return <ProfileSettingsForm userData={sampleUserData} />
+        return <ProfileSettingsForm userData={userData} />
       case "account":
         return <AccountSettingsView />
       case "appearance":

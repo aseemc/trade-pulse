@@ -1,10 +1,19 @@
 "use client"
 
 import * as React from "react"
-import { useProfile, type UserProfile } from "@/hooks/use-profile"
+import { useProfile } from "@/hooks/use-profile"
 
 interface ProfileContextType {
-  profile: UserProfile | null
+  profile: {
+    id: number
+    user_id: string
+    first_name: string
+    last_name: string
+    email: string
+    avatar: string | null
+    username: string
+    dob: string | null
+  } | null
   loading: boolean
   error: Error | null
   refetch: () => Promise<void>
@@ -13,8 +22,8 @@ interface ProfileContextType {
 const ProfileContext = React.createContext<ProfileContextType | undefined>(undefined)
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
-  const { profile, loading, error } = useProfile()
-  const [, setRefetchTrigger] = React.useState(0)
+  const [refetchTrigger, setRefetchTrigger] = React.useState(0)
+  const { profile, loading, error } = useProfile(refetchTrigger)
 
   const refetch = React.useCallback(async () => {
     setRefetchTrigger(prev => prev + 1)
