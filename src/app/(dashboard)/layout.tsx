@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
 import { usePathname } from "next/navigation"
+import { ProfileProvider } from "@/contexts/profile-context"
 
 export default function DashboardLayout({
   children,
@@ -23,26 +24,28 @@ export default function DashboardLayout({
     : "Dashboard"
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="border-1 rounded-lg border-transparent m-2 shadow-md">
-        <header className="flex h-14 shrink-0 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <span className="text-md font-semibold text-primary">
-              {pageTitle}
-            </span>
-          </div>
-          <NavActions />
-        </header>
-        <Separator />
+    <ProfileProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="border-1 rounded-lg border-transparent m-2 shadow-md">
+          <header className="flex h-14 shrink-0 items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 data-[orientation=vertical]:h-4"
+              />
+              <span className="text-md font-semibold text-primary">
+                {pageTitle}
+              </span>
+            </div>
+            <NavActions />
+          </header>
+          <Separator />
 
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
+    </ProfileProvider>
   )
 } 
