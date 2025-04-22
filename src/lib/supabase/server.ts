@@ -17,14 +17,14 @@ export async function createClient() {
           try {
             await cookieStore.set(name, value, options)
           } catch (error) {
-            // Handle cookie setting error
+            console.error('=> cookie setting error', error);
           }
         },
         async remove(name: string, options: any) {
           try {
             await cookieStore.set(name, '', { ...options, maxAge: 0 })
           } catch (error) {
-            // Handle cookie removal error
+            console.error('=> cookie removal error', error);
           }
         },
       },

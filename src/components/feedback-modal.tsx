@@ -1,14 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FileText, Loader2, Paperclip, X } from "lucide-react"
-import { useState, useRef } from "react"
+import { Loader2 } from "lucide-react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
-import Image from "next/image"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { useProfileContext } from "@/contexts/profile-context"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -70,21 +67,12 @@ interface FeedbackModalProps {
   onOpenChange: (isOpen: boolean) => void
 }
 
-interface FilePreview {
-  name: string
-  type: string
-  size: number
-  previewUrl: string | null // Data URL for images, null for others
-}
-
 // The FeedbackModal Component
 export function FeedbackModal({ isOpen, onOpenChange }: FeedbackModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   // Comment out file preview state
   // const [filePreview, setFilePreview] = useState<FilePreview | null>(null)
   // const fileInputRef = useRef<HTMLInputElement>(null)
-  const supabase = createClientComponentClient()
-  const { profile } = useProfileContext()
 
   const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),

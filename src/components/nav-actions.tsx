@@ -1,7 +1,6 @@
 "use client"
 
 import { LogOut, Moon, Sun, Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -13,12 +12,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { NotificationsPopover } from "@/components/notifications-popover"
 import { useTheme } from "next-themes"
-import { toast } from "sonner"
 import { signOut } from "@/lib/actions/auth"
 
 export function NavActions() {
   const { setTheme } = useTheme()
-  const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const handleLogout = async () => {

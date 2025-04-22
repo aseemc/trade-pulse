@@ -26,6 +26,7 @@ export async function getProfile() {
 
     return { data }
   } catch (error) {
+    console.error('=> getProfile', error);
     return { error: 'Failed to fetch profile' }
   }
 } 
