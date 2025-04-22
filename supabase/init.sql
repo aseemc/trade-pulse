@@ -24,7 +24,7 @@ language plpgsql
 security definer set search_path = ''
 as $$
 begin
-  insert into public.profile (user_id, first_name, last_name, email, dob, username)
+  insert into public.profiles (user_id, first_name, last_name, email, dob, username)
   values (new.id, new.raw_user_meta_data ->> 'first_name', new.raw_user_meta_data ->> 'last_name', new.email, new.raw_user_meta_data ->> 'date_of_birth', new.raw_user_meta_data ->> 'username');
   return new;
 end;
@@ -35,6 +35,45 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- Create a policy to enable insert for authenticated users only
+create policy "Enable insert for authenticated users only"
+on "public"."profiles"
+as PERMISSIVE
+for INSERT
+to authenticated
+with check (
+  true
+);
+
+-- Create a policy to enable authenticated users to view their own profiles
+create policy "Enable select for authenticated users only"
+on "public"."profiles"
+as PERMISSIVE
+for SELECT
+to authenticated
+using (
+  (select auth.uid()) = user_id
+);
+
+-- Create a policy to enable authenticated users to update their own profiles
+create policy "Enable update for authenticated users only"
+on "public"."profiles"
+as PERMISSIVE
+for UPDATE
+to authenticated
+with check (
+  (select auth.uid()) = user_id
+);
+
+-- Create a policy to enable authenticated users to delete their own profiles
+create policy "Enable delete for authenticated users only"
+on "public"."profiles"
+as PERMISSIVE
+for DELETE
+to authenticated
+using (
+  (select auth.uid()) = user_id
+);
 
 -- Create a storage bucket for avatars with public access and max size of 2MB
 insert into storage.buckets (id, name, public, file_size_limit) values ('avatars', 'avatars', true, 2097152);

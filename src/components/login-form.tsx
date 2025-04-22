@@ -47,7 +47,7 @@ export function LoginForm({
       }
     } catch (error: any) {
       // Ignore NEXT_REDIRECT errors as they are expected
-      if (error?.digest === 'NEXT_REDIRECT') {
+      if (error?.message === 'NEXT_REDIRECT') {
         return;
       }
       console.error("Login error:", error);

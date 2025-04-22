@@ -19,22 +19,6 @@ export function NavActions() {
   const { setTheme } = useTheme()
   const router = useRouter()
 
-  const handleLogout = async () => {
-    try {
-      const result = await signOut();
-      if (result?.error) {
-        toast.error(result.error);
-      }
-    } catch (error: any) {
-      // Ignore NEXT_REDIRECT errors as they are expected
-      if (error?.digest === 'NEXT_REDIRECT') {
-        return;
-      }
-      console.error("Logout error:", error);
-      toast.error("An unexpected error occurred. Please try again.");
-    }
-  }
-
   return (
     <div className="flex items-center gap-2">
       <DropdownMenu>
@@ -60,7 +44,7 @@ export function NavActions() {
 
       <NotificationsPopover />
 
-      <Button variant="ghost" size="icon" onClick={handleLogout}>
+      <Button variant="ghost" size="icon" onClick={signOut}>
         <LogOut className="size-4" />
         <span className="sr-only">Logout</span>
       </Button>
