@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { toast } from "sonner";
 import Link from "next/link";
 import { SquareActivity } from "lucide-react";
+import { supabase } from "@/lib/supabase"
 
 const magicLinkSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -30,8 +31,17 @@ export default function MagicLinkPage() {
   async function onSubmit(values: z.infer<typeof magicLinkSchema>) {
     setIsLoading(true);
     try {
-      // TODO: Implement magic link logic
-      console.log(values);
+      const { error } = await supabase.auth.signInWithOtp({
+        email: values.email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
       setIsEmailSent(true);
       toast.success("Magic link sent to your email!");
     } catch (error) {

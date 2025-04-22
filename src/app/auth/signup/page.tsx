@@ -16,6 +16,8 @@ import Link from "next/link";
 import { SquareActivity, CalendarIcon, Upload } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -44,6 +46,7 @@ const signupSchema = z.object({
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -82,9 +85,41 @@ export default function SignupPage() {
   async function onSubmit(values: z.infer<typeof signupSchema>) {
     setIsLoading(true);
     try {
-      // TODO: Implement signup logic
-      console.log(values);
+      // Sign up with Supabase
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            first_name: values.firstName,
+            last_name: values.lastName,
+            username: values.username,
+            date_of_birth: values.dateOfBirth,
+          },
+        },
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      // Upload avatar if provided
+      if (values.avatar) {
+        const fileExt = values.avatar.name.split('.').pop();
+        const filePath = `${authData.user?.id}/avatar.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, values.avatar);
+
+        if (uploadError) {
+          console.error('Avatar upload error:', uploadError);
+          // Continue with signup even if avatar upload fails
+        }
+      }
+
       toast.success("Account created successfully!");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Signup error:", error);
       toast.error("Failed to create account. Please try again.");
