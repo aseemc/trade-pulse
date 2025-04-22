@@ -1,7 +1,7 @@
 "use client"
 
 import { LogOut, Moon, Sun } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,9 +12,25 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { NotificationsPopover } from "@/components/notifications-popover"
 import { useTheme } from "next-themes"
+import { supabase } from "@/lib/supabase"
+import { toast } from "sonner"
 
 export function NavActions() {
   const { setTheme } = useTheme()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      
+      toast.success("Logged out successfully")
+      router.push("/auth/login")
+    } catch (error) {
+      console.error("Logout error:", error)
+      toast.error("Failed to logout. Please try again.")
+    }
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -41,11 +57,9 @@ export function NavActions() {
 
       <NotificationsPopover />
 
-      <Button variant="ghost" size="icon" asChild>
-        <Link href="/auth/login">
-          <LogOut className="size-4" />
-          <span className="sr-only">Logout</span>
-        </Link>
+      <Button variant="ghost" size="icon" onClick={handleLogout}>
+        <LogOut className="size-4" />
+        <span className="sr-only">Logout</span>
       </Button>
     </div>
   )

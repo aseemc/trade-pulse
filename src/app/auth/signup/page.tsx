@@ -95,6 +95,7 @@ export default function SignupPage() {
             last_name: values.lastName,
             username: values.username,
             date_of_birth: values.dateOfBirth,
+            avatar: ''
           },
         },
       });
