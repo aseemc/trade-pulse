@@ -16,6 +16,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const { profile, loading, error } = useProfile()
   const [refetchTrigger, setRefetchTrigger] = React.useState(0)
 
+  console.log('=> profile', profile, loading, error);
+  
   const refetch = React.useCallback(async () => {
     setRefetchTrigger(prev => prev + 1)
   }, [])
