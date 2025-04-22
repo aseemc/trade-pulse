@@ -1,7 +1,8 @@
 "use client"
 
-import { LogOut, Moon, Sun } from "lucide-react"
+import { LogOut, Moon, Sun, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,6 +19,13 @@ import { signOut } from "@/lib/actions/auth"
 export function NavActions() {
   const { setTheme } = useTheme()
   const router = useRouter()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    await signOut()
+    setIsLoggingOut(false)
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -44,8 +52,17 @@ export function NavActions() {
 
       <NotificationsPopover />
 
-      <Button variant="ghost" size="icon" onClick={signOut}>
-        <LogOut className="size-4" />
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={handleLogout}
+        disabled={isLoggingOut}
+      >
+        {isLoggingOut ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <LogOut className="size-4" />
+        )}
         <span className="sr-only">Logout</span>
       </Button>
     </div>
