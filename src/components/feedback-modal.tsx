@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 import Image from "next/image"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { useProfileContext } from "@/contexts/profile-context"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -23,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
+import { submitFeedback } from "@/app/actions/feedback"
 
 // Comment out attachment-related constants
 // const MAX_FILE_SIZE = 4 * 1024 * 1024 // 4MB
@@ -82,6 +84,7 @@ export function FeedbackModal({ isOpen, onOpenChange }: FeedbackModalProps) {
   // const [filePreview, setFilePreview] = useState<FilePreview | null>(null)
   // const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClientComponentClient()
+  const { profile } = useProfileContext()
 
   const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),
@@ -117,16 +120,15 @@ export function FeedbackModal({ isOpen, onOpenChange }: FeedbackModalProps) {
   const onSubmit = async (data: FeedbackFormValues) => {
     setIsSubmitting(true)
     try {
-      const { error } = await supabase
-        .from('feedbacks')
-        .insert([
-          {
-            subject: data.subject,
-            message: data.message,
-          }
-        ])
+      const result = await submitFeedback({
+        subject: data.subject,
+        message: data.message
+      })
 
-      if (error) throw error
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
 
       toast.success("Feedback submitted successfully!")
       handleOpenChange(false)
@@ -157,9 +159,11 @@ export function FeedbackModal({ isOpen, onOpenChange }: FeedbackModalProps) {
                 id="subject"
                 placeholder="e.g., Issue with chart loading"
                 {...form.register("subject")}
-                className={cn(form.formState.errors.subject && "border-destructive focus-visible:ring-destructive")}
+                className={cn(
+                  form.formState.errors.subject && form.formState.touchedFields.subject && "border-destructive focus-visible:ring-destructive"
+                )}
               />
-              {form.formState.errors.subject && (
+              {form.formState.errors.subject && form.formState.touchedFields.subject && (
                 <p className="text-xs text-destructive">
                   {form.formState.errors.subject.message}
                 </p>
@@ -174,10 +178,13 @@ export function FeedbackModal({ isOpen, onOpenChange }: FeedbackModalProps) {
                 placeholder="Please provide as much detail as possible..."
                 rows={5}
                 {...form.register("message")}
-                className={cn("resize-none", form.formState.errors.message && "border-destructive focus-visible:ring-destructive")}
+                className={cn(
+                  "resize-none",
+                  form.formState.errors.message && form.formState.touchedFields.message && "border-destructive focus-visible:ring-destructive"
+                )}
               />
               <div className="flex justify-between items-center">
-                {form.formState.errors.message && (
+                {form.formState.errors.message && form.formState.touchedFields.message && (
                   <p className="text-xs text-destructive">
                     {form.formState.errors.message.message}
                   </p>

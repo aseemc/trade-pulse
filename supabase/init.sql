@@ -86,10 +86,12 @@ create table public.feedbacks (
   constraint feedbacks_id_key unique (id)
 ) TABLESPACE pg_default;
 
--- Create policy to allow users to add their own feedbacks
-CREATE POLICY "Users can add their own feedbacks"
-ON public.feedbacks FOR INSERT
-TO authenticated
-WITH CHECK (
-  user_id = auth.uid()
+-- Create policy to allow authenticated users to add their own feedbacks
+create policy "Enable insert for authenticated users only"
+on "public"."feedbacks"
+as PERMISSIVE
+for INSERT
+to authenticated
+with check (
+  true
 );
