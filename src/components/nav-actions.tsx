@@ -24,7 +24,6 @@ export function NavActions() {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
       
-      toast.success("Logged out successfully")
       router.push("/auth/login")
     } catch (error) {
       console.error("Logout error:", error)

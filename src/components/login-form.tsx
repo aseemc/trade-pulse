@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
+import { Loader2 } from "lucide-react"
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -51,11 +52,10 @@ export function LoginForm({
         throw error;
       }
 
-      toast.success("Login successful!");
       router.push("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Login failed. Please check your credentials and try again.");
+      toast.error(`Login failed. ${error instanceof Error ? error.message : 'An unknown error occurred'}`);
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +112,14 @@ export function LoginForm({
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Logging in
+                    </>
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
                 <div className="flex flex-col gap-4">
                   <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">

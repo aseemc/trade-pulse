@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import Link from "next/link";
-import { SquareActivity } from "lucide-react";
+import { SquareActivity, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase"
 
 const magicLinkSchema = z.object({
@@ -88,7 +88,14 @@ export default function MagicLinkPage() {
                     )}
                   />
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Sending..." : "Send Magic Link"}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending
+                      </>
+                    ) : (
+                      "Send Magic Link"
+                    )}
                   </Button>
                 </form>
               </Form>

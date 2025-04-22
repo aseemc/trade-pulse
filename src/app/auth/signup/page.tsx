@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 import Link from "next/link";
-import { SquareActivity, CalendarIcon, Upload } from "lucide-react";
+import { SquareActivity, CalendarIcon, Upload, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -29,15 +29,6 @@ const signupSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
-  dateOfBirth: z.date().optional(),
-  avatar: z
-    .any()
-    .refine((file) => !file || file.size <= MAX_FILE_SIZE, "Max file size is 5MB")
-    .refine(
-      (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type),
-      "Only .jpg, .jpeg, .png and .webp files are accepted"
-    )
-    .optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -45,7 +36,6 @@ const signupSchema = z.object({
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof signupSchema>>({
@@ -57,30 +47,8 @@ export default function SignupPage() {
       username: "",
       password: "",
       confirmPassword: "",
-      dateOfBirth: undefined,
-      avatar: undefined,
     },
   });
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error("File size must be less than 5MB");
-        return;
-      }
-      if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-        toast.error("Only .jpg, .jpeg, .png and .webp files are accepted");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-        form.setValue("avatar", file);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   async function onSubmit(values: z.infer<typeof signupSchema>) {
     setIsLoading(true);
@@ -94,29 +62,12 @@ export default function SignupPage() {
             first_name: values.firstName,
             last_name: values.lastName,
             username: values.username,
-            date_of_birth: values.dateOfBirth,
-            avatar: ''
           },
         },
       });
 
       if (authError) {
         throw authError;
-      }
-
-      // Upload avatar if provided
-      if (values.avatar) {
-        const fileExt = values.avatar.name.split('.').pop();
-        const filePath = `${authData.user?.id}/avatar.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(filePath, values.avatar);
-
-        if (uploadError) {
-          console.error('Avatar upload error:', uploadError);
-          // Continue with signup even if avatar upload fails
-        }
       }
 
       toast.success("Account created successfully!");
@@ -147,29 +98,6 @@ export default function SignupPage() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
                 <div className="grid gap-6">
-                  <div className="flex justify-center">
-                    <div className="relative group cursor-pointer">
-                      <div className="transition-transform duration-200 group-hover:scale-110">
-                        <Avatar className="h-24 w-24">
-                          <AvatarImage src={avatarPreview || "/placeholder-avatar.svg"} />
-                          <AvatarFallback>
-                            {form.getValues("firstName")?.[0]}
-                            {form.getValues("lastName")?.[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                          <Upload className="h-6 w-6 text-white" />
-                        </div>
-                      </div>
-                      <Input
-                        type="file"
-                        accept={ACCEPTED_IMAGE_TYPES.join(",")}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                        onChange={handleAvatarChange}
-                      />
-                    </div>
-                  </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -255,50 +183,15 @@ export default function SignupPage() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="dateOfBirth"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Date of Birth (Optional)</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) =>
-                                date > new Date() || date < new Date("1900-01-01")
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Creating account..." : "Create Account"}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account
+                      </>
+                    ) : (
+                      "Create Account"
+                    )}
                   </Button>
                 </div>
                 <div className="text-center text-sm">
