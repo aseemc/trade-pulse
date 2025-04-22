@@ -169,6 +169,7 @@ export function ProfileSettingsForm({ userData }: ProfileSettingsFormProps) {
       form.reset({ ...data, avatar: undefined });
       if (avatarInputRef.current) avatarInputRef.current.value = "";
     } catch (error) {
+      console.error('=> onSubmit error:', error)
       toast.error("Failed to update profile.")
     } finally {
       setIsSubmitting(false)
