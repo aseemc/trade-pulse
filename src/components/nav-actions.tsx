@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { NotificationsPopover } from "@/components/notifications-popover"
 import { useTheme } from "next-themes"
-import { supabase } from "@/lib/supabase"
 import { toast } from "sonner"
+import { signOut } from "@/lib/actions/auth"
 
 export function NavActions() {
   const { setTheme } = useTheme()
@@ -21,13 +21,17 @@ export function NavActions() {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
-      
-      router.push("/auth/login")
-    } catch (error) {
-      console.error("Logout error:", error)
-      toast.error("Failed to logout. Please try again.")
+      const result = await signOut();
+      if (result?.error) {
+        toast.error(result.error);
+      }
+    } catch (error: any) {
+      // Ignore NEXT_REDIRECT errors as they are expected
+      if (error?.digest === 'NEXT_REDIRECT') {
+        return;
+      }
+      console.error("Logout error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     }
   }
 

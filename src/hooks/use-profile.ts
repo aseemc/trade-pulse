@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getProfile } from '@/lib/actions/profile'
 
 export interface UserProfile {
   id: number
@@ -20,19 +20,11 @@ export function useProfile(refetchTrigger = 0) {
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) {
-          throw new Error('No session found')
+        const result = await getProfile()
+        if (result.error) {
+          throw new Error(result.error)
         }
-
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single()
-
-        if (error) throw error
-        setProfile(data)
+        setProfile(result.data)
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch profile'))
       } finally {

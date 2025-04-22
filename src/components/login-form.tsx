@@ -16,9 +16,8 @@ import * as z from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { toast } from "sonner"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase"
 import { Loader2 } from "lucide-react"
+import { signIn } from "@/lib/actions/auth"
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -30,7 +29,6 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -43,19 +41,17 @@ export function LoginForm({
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
-
-      if (error) {
-        throw error;
+      const result = await signIn(values);
+      if (result?.error) {
+        toast.error(result.error);
       }
-
-      router.push("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
+      // Ignore NEXT_REDIRECT errors as they are expected
+      if (error?.digest === 'NEXT_REDIRECT') {
+        return;
+      }
       console.error("Login error:", error);
-      toast.error(`Login failed. ${error instanceof Error ? error.message : 'An unknown error occurred'}`);
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -111,42 +107,42 @@ export function LoginForm({
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Logging in
-                    </>
-                  ) : (
-                    "Login"
-                  )}
-                </Button>
-                <div className="flex flex-col gap-4">
-                  <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                    <span className="bg-card text-muted-foreground relative z-10 px-2">
-                      Or continue with
-                    </span>
-                  </div>
-                  <div className="grid gap-2">
-                    <Button variant="outline" className="w-full" asChild>
-                      <Link href="/auth/magic-link">Magic link</Link>
-                    </Button>
-                    <Button variant="outline" className="w-full" disabled>
-                      Login with Google
-                    </Button>
-                  </div>
-                </div>
               </div>
-              <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <Link href="/auth/signup" className="underline underline-offset-4">
-                  Sign up
-                </Link>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Logging in
+                  </>
+                ) : (
+                  "Login"
+                )}
+              </Button>
+              <div className="flex flex-col gap-4">
+                <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+                  <span className="bg-card text-muted-foreground relative z-10 px-2">
+                    Or continue with
+                  </span>
+                </div>
+                <div className="grid gap-2">
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/auth/magic-link">Magic link</Link>
+                  </Button>
+                  <Button variant="outline" className="w-full" disabled>
+                    Login with Google
+                  </Button>
+                </div>
               </div>
             </form>
           </Form>
         </CardContent>
       </Card>
+      <div className="text-center text-sm">
+        Don&apos;t have an account?{" "}
+        <Link href="/auth/signup" className="underline underline-offset-4">
+          Sign up
+        </Link>
+      </div>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
         By clicking continue, you agree to our <Link href="#">Terms of Service</Link>{" "}
         and <Link href="#">Privacy Policy</Link>.

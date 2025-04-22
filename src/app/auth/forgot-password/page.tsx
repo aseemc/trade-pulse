@@ -10,8 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import Link from "next/link";
-import { SquareActivity } from "lucide-react";
-import { supabase } from "@/lib/supabase"
+import { SquareActivity, Loader2 } from "lucide-react";
+import { resetPassword } from "@/lib/actions/auth";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -31,19 +31,16 @@ export default function ForgotPasswordPage() {
   async function onSubmit(values: z.infer<typeof forgotPasswordSchema>) {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      });
-
-      if (error) {
-        throw error;
+      const result = await resetPassword(values);
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        setIsEmailSent(true);
+        toast.success("Password reset instructions sent to your email!");
       }
-
-      setIsEmailSent(true);
-      toast.success("Password reset instructions sent to your email!");
     } catch (error) {
       console.error("Password reset error:", error);
-      toast.error("Failed to send reset instructions. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +82,14 @@ export default function ForgotPasswordPage() {
                     )}
                   />
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Sending..." : "Send Reset Instructions"}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending
+                      </>
+                    ) : (
+                      "Send Reset Instructions"
+                    )}
                   </Button>
                   <div className="text-center text-sm">
                     Remember your password?{" "}

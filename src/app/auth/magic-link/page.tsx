@@ -6,12 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import Link from "next/link";
 import { SquareActivity, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase"
+import { sendMagicLink } from "@/lib/actions/auth";
 
 const magicLinkSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -31,22 +31,16 @@ export default function MagicLinkPage() {
   async function onSubmit(values: z.infer<typeof magicLinkSchema>) {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: values.email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        throw error;
+      const result = await sendMagicLink(values);
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        setIsEmailSent(true);
+        toast.success("Magic link sent to your email!");
       }
-
-      setIsEmailSent(true);
-      toast.success("Magic link sent to your email!");
     } catch (error) {
       console.error("Magic link error:", error);
-      toast.error("Failed to send magic link. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -97,6 +91,12 @@ export default function MagicLinkPage() {
                       "Send Magic Link"
                     )}
                   </Button>
+                  <div className="text-center text-sm">
+                    Remember your password?{" "}
+                    <Link href="/auth/login" className="underline underline-offset-4">
+                      Login
+                    </Link>
+                  </div>
                 </form>
               </Form>
             ) : (
@@ -117,15 +117,11 @@ export default function MagicLinkPage() {
               </div>
             )}
           </CardContent>
-          <CardFooter>
-            <div className="text-sm text-muted-foreground w-full text-center">
-              Remember your password?{" "}
-              <Link href="/auth/login" className="text-primary hover:underline">
-                Login with password
-              </Link>
-            </div>
-          </CardFooter>
         </Card>
+        <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
+          By clicking continue, you agree to our <Link href="#">Terms of Service</Link>{" "}
+          and <Link href="#">Privacy Policy</Link>.
+        </div>
       </div>
     </div>
   );

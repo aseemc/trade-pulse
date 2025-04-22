@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { signUp } from "@/lib/actions/auth";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -53,28 +54,20 @@ export default function SignupPage() {
   async function onSubmit(values: z.infer<typeof signupSchema>) {
     setIsLoading(true);
     try {
-      // Sign up with Supabase
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const result = await signUp({
         email: values.email,
         password: values.password,
-        options: {
-          data: {
-            first_name: values.firstName,
-            last_name: values.lastName,
-            username: values.username,
-          },
-        },
+        firstName: values.firstName,
+        lastName: values.lastName,
+        username: values.username,
       });
 
-      if (authError) {
-        throw authError;
+      if (result?.error) {
+        toast.error(result.error);
       }
-
-      toast.success("Account created successfully!");
-      router.push("/dashboard");
     } catch (error) {
       console.error("Signup error:", error);
-      toast.error("Failed to create account. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
