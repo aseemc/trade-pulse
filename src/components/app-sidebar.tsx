@@ -22,15 +22,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-}
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = React.useState(false)
   const router = useRouter()
@@ -69,16 +60,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu>
             <SidebarMenuItem>
               <div
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-2 mt-2"
-                  >
-                    <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                      <SquareActivity className="size-4" />
-                    </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">Trade Pulse</span>
-                      <span className="truncate text-xs text-muted-foreground">Free</span>
-                    </div>
-                  </div>
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-2 mt-2"
+              >
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <SquareActivity className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">Trade Pulse</span>
+                  <span className="truncate text-xs text-muted-foreground">Free</span>
+                </div>
+              </div>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
@@ -89,7 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={appUpgrade} label="" />
         </div>
         <SidebarFooter>
-          <NavUser user={data.user} />
+          <NavUser />
         </SidebarFooter>
       </Sidebar>
 
