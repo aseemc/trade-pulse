@@ -168,7 +168,7 @@ export function NotificationsPopover({ open, onOpenChange }: NotificationsPopove
                 <Button
                   variant="link"
                   size="sm"
-                  className="h-auto p-0 text-sm text-primary hover:underline"
+                  className="h-auto cursor-pointer p-0 text-xs text-primary hover:underline"
                   onClick={markAllAsRead}
                 >
                   Mark all as read
@@ -177,7 +177,7 @@ export function NotificationsPopover({ open, onOpenChange }: NotificationsPopove
             </div>
             <div className="flex-1 overflow-y-auto">
               {localNotifications.length === 0 ? (
-                <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground cursor-pointer">
                   You&apos;re all caught up!
                 </div>
               ) : (
@@ -188,7 +188,7 @@ export function NotificationsPopover({ open, onOpenChange }: NotificationsPopove
                       onClick={() => handleNotificationClick(notification)}
                       className={cn(
                         "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors",
-                        "hover:bg-accent hover:text-accent-foreground",
+                        "hover:bg-accent hover:text-accent-foreground cursor-pointer",
                         !notification.read && "bg-accent/50"
                       )}
                     >
@@ -222,7 +222,7 @@ export function NotificationsPopover({ open, onOpenChange }: NotificationsPopove
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full text-sm font-medium text-primary hover:bg-accent hover:text-accent-foreground"
+                  className="w-full cursor-pointer text-sm font-medium text-primary hover:bg-accent hover:text-accent-foreground"
                   onClick={loadMoreNotifications}
                 >
                   Load More
