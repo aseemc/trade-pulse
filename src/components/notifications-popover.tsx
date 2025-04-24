@@ -1,7 +1,7 @@
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, Check, CheckCheck } from "lucide-react"
+import { Bell } from "lucide-react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -178,7 +178,7 @@ export function NotificationsPopover({ open, onOpenChange }: NotificationsPopove
             <div className="flex-1 overflow-y-auto">
               {localNotifications.length === 0 ? (
                 <div className="flex h-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
-                  You're all caught up!
+                  You&apos;re all caught up!
                 </div>
               ) : (
                 <div className="divide-y divide-border">
