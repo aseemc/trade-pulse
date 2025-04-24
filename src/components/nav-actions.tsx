@@ -28,9 +28,9 @@ export function NavActions() {
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-4">
       <DropdownMenu open={isThemeMenuOpen} onOpenChange={setIsThemeMenuOpen}>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild className="cursor-pointer">
           <Button variant="ghost" size="icon" className={cn(isThemeMenuOpen && "bg-muted")}>
             <Sun className="size-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -38,13 +38,13 @@ export function NavActions() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setTheme("light")}>
+          <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer">
             Light
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("dark")}>
+          <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer">
             Dark
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("system")}>
+          <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer">
             System
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -57,7 +57,7 @@ export function NavActions() {
         size="icon" 
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className={cn(isLoggingOut && "bg-muted")}
+        className={cn(isLoggingOut && "bg-muted", "cursor-pointer")}
       >
         {isLoggingOut ? (
           <Loader2 className="size-4 animate-spin" />

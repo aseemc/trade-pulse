@@ -95,7 +95,7 @@ export function SettingsLayout() {
       </div>
 
       <div className="hidden lg:flex lg:flex-row lg:space-x-12">
-        <aside className="w-1/5">
+        <aside className="w-1/6">
           <nav className="flex flex-col space-y-1">
             {sidebarNavItems.map((item) => (
               <Button

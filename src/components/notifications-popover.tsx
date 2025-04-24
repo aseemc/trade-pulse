@@ -150,7 +150,7 @@ export function NotificationsPopover({ open, onOpenChange }: NotificationsPopove
     <>
       <Popover open={open} onOpenChange={onOpenChange}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className={cn("relative", open && "bg-muted")}>
+          <Button variant="ghost" size="icon" className={cn("relative", open && "bg-muted", "cursor-pointer")}>
             <Bell className="size-5" />
             {unreadCount > 0 && (
               <span className="absolute -right-2 -top-1.5 flex h-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-primary-foreground">
