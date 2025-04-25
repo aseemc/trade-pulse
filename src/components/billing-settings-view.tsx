@@ -88,7 +88,7 @@ export function BillingSettingsView() {
         {plans.map((plan) => (
           <Card 
             key={plan.name} 
-            className="overflow-hidden rounded-3xl hover:border-primary/50 transition-all duration-200 cursor-pointer hover:scale-105 hover:shadow-lg"
+            className="overflow-hidden rounded-3xl hover:border-primary/50 transition-all duration-200 cursor-pointer hover:scale-102 hover:shadow-lg"
           >
             <CardHeader className="space-y-2">
               <CardTitle className="text-xl flex items-center justify-between">{plan.name}
