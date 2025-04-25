@@ -1,16 +1,15 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { BillingSettingsView } from "@/components/billing-settings-view"
 
 export function AccountSettingsView() {
   return (
-    <Card>
+    <Card className="w-full max-w-none">
       <CardHeader>
-        <CardTitle>Account Settings</CardTitle>
-        <CardDescription>Manage your account details (coming soon).</CardDescription>
+        <CardTitle>Plans & Billing</CardTitle>
+        <CardDescription>Manage your subscription and billing information.</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">
-          This section is under construction. You&apos;ll soon be able to manage login methods, security settings, and more.
-        </p>
+        <BillingSettingsView />
       </CardContent>
     </Card>
   )

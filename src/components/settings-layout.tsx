@@ -13,7 +13,7 @@ import { useProfileContext } from "@/contexts/profile-context"
 
 const sidebarNavItems = [
   { title: "Profile", key: "profile" },
-  { title: "Account", key: "account" },
+  { title: "Plans & Billing", key: "account" },
   { title: "Appearance", key: "appearance" },
   { title: "Notifications", key: "notifications" },
   { title: "Display", key: "display" },
@@ -95,7 +95,7 @@ export function SettingsLayout() {
       </div>
 
       <div className="hidden lg:flex lg:flex-row lg:space-x-12">
-        <aside className="w-1/5">
+        <aside className="w-44 flex-shrink-0">
           <nav className="flex flex-col space-y-1">
             {sidebarNavItems.map((item) => (
               <Button
@@ -115,7 +115,7 @@ export function SettingsLayout() {
             ))}
           </nav>
         </aside>
-        <div className="flex-1 lg:max-w-2xl">{renderSection()}</div>
+        <div className="flex-1">{renderSection()}</div>
       </div>
     </div>
   )
